@@ -122,3 +122,6 @@ You need to do steps 1 and 5 above before this.
 
 3.  **Access the Application:**
     * Open your web browser and navigate to `http://localhost:8501`.
+
+## Demo
+![demo](./assets/demo.gif)
