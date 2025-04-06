@@ -45,11 +45,12 @@ This project implements an Retrieval-Augmented Generation (RAG) system using **G
 * **Google API Key:** You need an API key for Google Generative AI (e.g., Gemini API). You can obtain one from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ## How to use
+### Without Docker
 
 1.  **Clone the Repository:**
     ```bash
-    git clone <your-repository-url>
-    cd <repository-directory>
+    git clone https://github.com/luanntd/RAG-System-with-Gemini.git
+    cd RAG-System-with-Gemini
     ```
 
 2.  **Create a Virtual Environment (Recommended):**
@@ -66,26 +67,58 @@ This project implements an Retrieval-Augmented Generation (RAG) system using **G
     pip install -r requirements.txt
     ```
 
-4.  **Set Up Environment Variables:**
+4. **Create Directory for Vector Store**
+    ```bash
+    mkdir chroma_db
+    ```
+
+5.  **Set Up Environment Variables:**
     * Create a file named `.env` in the project's root directory.
-    * Copy the contents of `.env.example` (if provided) or add the following variables:
+    * Add the following variables:
 
         ```dotenv
-        # .env file
-        GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
-        COLLECTION_NAME="rag_system" # Or your preferred ChromaDB collection name (must follow ChromaDB rules)
-
-        # --- Optional: Required only for Web Search feature ---
-        # TAVILY_API_KEY="YOUR_TAVILY_API_KEY"
+        GOOGLE_API_KEY=YOUR_GOOGLE_API_KEY
+        COLLECTION_NAME=rag_system
+        DB_PATH=chroma_db
         ```
     * Replace `"YOUR_GOOGLE_API_KEY"` with your actual Google API key.
-    * Replace `"YOUR_TAVILY_API_KEY"` if you plan to use the web search feature.
 
-## Running the Application
+6. **Running the Application**
+    ```bash
+    streamlit run main.py
+    ```
 
-You can run the application either directly using Streamlit or via Docker.
+### With Docker (Recommended)
 
-### 1. Running Locally
+You need to do steps 1 and 5 above before this.
 
-```bash
-streamlit run app.py
+1.  **Build the Docker Image:**
+    ```bash
+    docker build -t rag-system .
+    ```
+
+2.  **Run the Docker Container:**
+    * Create the volume:
+        ```bash
+        docker volume create chroma_data
+        ```
+    * Run the container:
+        ```bash
+        docker run -d \
+            -p 8501:8501 \
+            --env-file ./.env \
+            -v chroma_data:/chroma_db \
+            --name rag-system-container \
+            rag-system
+        ```
+
+    * **Explanation of `docker run` flags:**
+        * `-d`: Run the container in detached mode (in the background).
+        * `-p 8501:8501`: Map port 8501 on your host machine to port 8501 inside the container.
+        * `--env-file ./.env`: Load environment variables from your local `.env` file into the container.
+        * `-v rag_chroma_data:/app/chroma_db`: Mounts persistent storage. It links the named volume `chroma_data` to the `/chroma_db` directory *inside* the container. This path (`/chroma_db`) is where ChromaDB will store its data.
+        * `--name rag-system-container`: Assigns a name to your running container.
+        * `rag-system`: The name of the Docker image you built.
+
+3.  **Access the Application:**
+    * Open your web browser and navigate to `http://localhost:8501`.

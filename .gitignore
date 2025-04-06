@@ -1,0 +1,6 @@
+__pycache__
+utils/__pycache__
+chroma_db/
+venv/
+.env
+.dockerignore
